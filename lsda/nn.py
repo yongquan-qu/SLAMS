@@ -6,38 +6,6 @@ import torch.nn as nn
 from torch import Tensor
 from typing import *
 
-def conv2d_bn_relu(inch,outch,kernel_size,stride=1,padding=1):
-    convlayer = torch.nn.Sequential(
-        torch.nn.Conv2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
-        torch.nn.BatchNorm2d(outch),
-        torch.nn.ReLU()
-    )
-    return convlayer
-
-def conv2d_bn_sigmoid(inch,outch,kernel_size,stride=1,padding=1):
-    convlayer = torch.nn.Sequential(
-        torch.nn.Conv2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
-        torch.nn.BatchNorm2d(outch),
-        torch.nn.Sigmoid()
-    )
-    return convlayer
-
-
-def deconv_relu(inch,outch,kernel_size,stride=1,padding=1):
-    convlayer = torch.nn.Sequential(
-        torch.nn.ConvTranspose2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
-        torch.nn.BatchNorm2d(outch),
-        torch.nn.ReLU()
-    )
-    return convlayer
-
-def deconv_sigmoid(inch,outch,kernel_size,stride=1,padding=1):
-    convlayer = torch.nn.Sequential(
-        torch.nn.ConvTranspose2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
-        torch.nn.Sigmoid()
-    )
-    return convlayer
-
 
 class EncoderDecoder(nn.Module):
     def __init__(
