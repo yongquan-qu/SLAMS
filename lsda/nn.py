@@ -6,6 +6,39 @@ import torch.nn as nn
 from torch import Tensor
 from typing import *
 
+def conv2d_bn_relu(inch,outch,kernel_size,stride=1,padding=1):
+    convlayer = torch.nn.Sequential(
+        torch.nn.Conv2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
+        torch.nn.BatchNorm2d(outch),
+        torch.nn.ReLU()
+    )
+    return convlayer
+
+def conv2d_bn_sigmoid(inch,outch,kernel_size,stride=1,padding=1):
+    convlayer = torch.nn.Sequential(
+        torch.nn.Conv2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
+        torch.nn.BatchNorm2d(outch),
+        torch.nn.Sigmoid()
+    )
+    return convlayer
+
+
+def deconv_relu(inch,outch,kernel_size,stride=1,padding=1):
+    convlayer = torch.nn.Sequential(
+        torch.nn.ConvTranspose2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
+        torch.nn.BatchNorm2d(outch),
+        torch.nn.ReLU()
+    )
+    return convlayer
+
+def deconv_sigmoid(inch,outch,kernel_size,stride=1,padding=1):
+    convlayer = torch.nn.Sequential(
+        torch.nn.ConvTranspose2d(inch,outch,kernel_size=kernel_size,stride=stride,padding=padding),
+        torch.nn.Sigmoid()
+    )
+    return convlayer
+
+
 class EncoderDecoder(nn.Module):
     def __init__(
         self, 
@@ -33,37 +66,41 @@ class EncoderDecoder(nn.Module):
             activation(),
             nn.Linear(hidden_features, out_features)
         )
-        
+
         
 class ConvEncoderDecoder(nn.Module):
     def __init__(
         self, 
         in_features: int,
-        hidden_features: int,
-        out_features: int,
-        window: int,
-        kernel_size: int = 2,
-        stride: int = 2,
+        hidden_channels: Sequence[int],
         activation: Callable[[], nn.Module] = nn.ReLU,
     ):
         super().__init__()
 
         self.in_features = in_features
-        self.hidden_features = hidden_features
-        self.out_features = out_features
-        self.window = window
+        self.hidden_channels = (in_features, ) + hidden_channels 
+        self.encoder = list()
+        self.decoder = list()
         
-        self.encoder = nn.Sequential(
-            nn.Conv2d(in_features, hidden_features, kernel_size, stride),
-            activation(),
-            nn.Conv2d(hidden_features, hidden_features, 1)
-        )
-        
-        self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(hidden_features, hidden_features, kernel_size, stride),
-            activation(),
-            nn.ConvTranspose2d(hidden_features, out_features, 1)
-        )
+        for n_layer in range(len(hidden_channels)):
+            self.encoder.append(
+                nn.Conv2d(self.hidden_channels[n_layer], self.hidden_channels[n_layer + 1], 63, 1, 31)
+            )
+            
+            self.decoder.append(
+                nn.ConvTranspose2d(self.hidden_channels[-1 - n_layer], self.hidden_channels[-2 - n_layer], 63, 1, 31)
+            )
+            
+            self.encoder.append(nn.BatchNorm2d(self.hidden_channels[n_layer + 1]))
+            self.decoder.append(nn.BatchNorm2d(self.hidden_channels[-2 - n_layer]))
+            
+            if n_layer < len(hidden_channels) - 1:
+                self.encoder.append(activation())
+                self.decoder.append(activation())
+                
+        self.encoder = nn.Sequential(*self.encoder)
+        self.decoder = nn.Sequential(*self.decoder)
+
 
 class ResidualBlock(nn.Sequential):
     r"""Creates a residual block."""
@@ -246,13 +283,12 @@ class UNet(nn.Module):
                 x = block(x, y)
 
             memory.append(x)
-
+            
         memory.pop()
 
         for blocks, tail in zip(self.ascent, self.tails):
             for block in blocks:
                 x = block(x, y)
-
             if memory:
                 x = tail(x) + memory.pop()
             else:
