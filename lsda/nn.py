@@ -41,22 +41,28 @@ class ConvEncoderDecoder(nn.Module):
         self, 
         in_features: int,
         hidden_channels: Sequence[int],
+        kernel_sizes: Sequence[int],
         activation: Callable[[], nn.Module] = nn.ReLU,
     ):
         super().__init__()
 
         self.in_features = in_features
         self.hidden_channels = (in_features, ) + hidden_channels 
+        self.kernel_sizes = kernel_sizes
         self.encoder = list()
         self.decoder = list()
         
         for n_layer in range(len(hidden_channels)):
             self.encoder.append(
-                nn.Conv2d(self.hidden_channels[n_layer], self.hidden_channels[n_layer + 1], 63, 1, 31)
+                nn.Conv2d(self.hidden_channels[n_layer], 
+                          self.hidden_channels[n_layer + 1], 
+                          self.kernel_sizes[n_layer], 1, (self.kernel_sizes[n_layer] - 1) // 2)
             )
             
             self.decoder.append(
-                nn.ConvTranspose2d(self.hidden_channels[-1 - n_layer], self.hidden_channels[-2 - n_layer], 63, 1, 31)
+                nn.ConvTranspose2d(self.hidden_channels[-1 - n_layer], 
+                                   self.hidden_channels[-2 - n_layer], 
+                                   self.kernel_sizes[n_layer], 1, (self.kernel_sizes[n_layer] - 1) // 2)
             )
             
             self.encoder.append(nn.BatchNorm2d(self.hidden_channels[n_layer + 1]))

@@ -154,14 +154,20 @@ class LocalScoreUNet(ScoreUNet):
     def __init__(
         self,
         channels: int,
-        size: int = 64,
+        size = 64,
+        with_forcing = True,
         **kwargs,
     ):
-        super().__init__(channels, 1, **kwargs)
-
-        domain = 2 * torch.pi / size * (torch.arange(size) + 1 / 2)
-        forcing = torch.sin(4 * domain).expand(1, size, size).clone()
-
+        if with_forcing:
+            context_channel = 1 
+            domain = 2 * torch.pi / size * (torch.arange(size) + 1 / 2)
+            forcing = torch.sin(4 * domain).expand(1, size, size).clone()
+            
+        else:
+            context_channel = 0
+            forcing = None
+        
+        super().__init__(channels, context_channel, **kwargs)
         self.register_buffer('forcing', forcing)
 
     def forward(self, x: Tensor, t: Tensor, c: Tensor = None) -> Tensor:
