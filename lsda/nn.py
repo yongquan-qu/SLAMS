@@ -42,33 +42,34 @@ class ConvEncoderDecoder(nn.Module):
         in_features: int,
         hidden_channels: Sequence[int],
         kernel_sizes: Sequence[int],
+        aux_features: int = 0,
         activation: Callable[[], nn.Module] = nn.ReLU,
     ):
         super().__init__()
 
         self.in_features = in_features
-        self.hidden_channels = (in_features, ) + hidden_channels 
+        self.forward_channels = (in_features + 1, ) + hidden_channels
+        self.reverse_channels = hidden_channels[::-1] + (in_features, ) 
         self.kernel_sizes = kernel_sizes
         self.encoder = list()
         self.decoder = list()
         
         for n_layer in range(len(hidden_channels)):
             self.encoder.append(
-                nn.Conv2d(self.hidden_channels[n_layer], 
-                          self.hidden_channels[n_layer + 1], 
+                nn.Conv2d(self.forward_channels[n_layer], 
+                          self.forward_channels[n_layer + 1], 
                           self.kernel_sizes[n_layer], 1, (self.kernel_sizes[n_layer] - 1) // 2)
             )
             
             self.decoder.append(
-                nn.ConvTranspose2d(self.hidden_channels[-1 - n_layer], 
-                                   self.hidden_channels[-2 - n_layer], 
+                nn.ConvTranspose2d(self.reverse_channels[n_layer], 
+                                   self.reverse_channels[n_layer + 1], 
                                    self.kernel_sizes[n_layer], 1, (self.kernel_sizes[n_layer] - 1) // 2)
             )
             
-            self.encoder.append(nn.BatchNorm2d(self.hidden_channels[n_layer + 1]))
-            self.decoder.append(nn.BatchNorm2d(self.hidden_channels[-2 - n_layer]))
-            
             if n_layer < len(hidden_channels) - 1:
+                self.encoder.append(nn.BatchNorm2d(self.forward_channels[n_layer + 1]))
+                self.decoder.append(nn.BatchNorm2d(self.reverse_channels[n_layer + 1]))
                 self.encoder.append(activation())
                 self.decoder.append(activation())
                 
@@ -269,3 +270,18 @@ class UNet(nn.Module):
                 x = tail(x)
 
         return x
+    
+    
+class GANResidualBlock(nn.Module):
+    def __init__(self, in_features):
+        super(GANResidualBlock, self).__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(in_features),
+            nn.PReLU(),
+            nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(in_features)
+        )
+
+    def forward(self, x):
+        return x + self.block(x)
