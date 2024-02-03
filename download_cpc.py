@@ -12,7 +12,7 @@ def download_file(url, save_path):
         with open(save_path, 'wb') as file:
             file.write(response.content)
 
-base_url = 'https://downloads.psl.noaa.gov//Datasets/cpc_global_precip/precip'
+base_url = 'https://downloads.psl.noaa.gov/Datasets/cpc_global_precip/precip'
 years = np.arange(1979, 2023)
 data_var = 'precip'
 

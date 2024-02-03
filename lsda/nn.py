@@ -48,8 +48,8 @@ class ConvEncoderDecoder(nn.Module):
         super().__init__()
 
         self.in_features = in_features
-        self.forward_channels = (in_features + 1, ) + hidden_channels
-        self.reverse_channels = hidden_channels[::-1] + (in_features, ) 
+        self.forward_channels = [in_features + aux_features, ] + hidden_channels
+        self.reverse_channels = hidden_channels[::-1] + [in_features, ]
         self.kernel_sizes = kernel_sizes
         self.encoder = list()
         self.decoder = list()

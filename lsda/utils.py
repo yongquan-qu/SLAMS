@@ -7,8 +7,12 @@ from pathlib import Path
 import re
 import xarray as xr
 import numpy as np
+import yaml
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import wasserstein_distance
 
-from lsda import config
+from lsda import config, model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -107,22 +111,25 @@ class ERA5Dataset(Dataset):
             return x, {}
         
 
-class CPCDataset(Dataset):
+class AuxDataset(Dataset):
     def __init__(
         self,
         years: List[int],
         size: Tuple[int],
         window: int = 1,
-        data_var = 'precip',
-        flatten: bool = False
+        flatten: bool = False,
+        data_path: str = '', 
+        data_var: str = ''
     ) -> None:
         
         self.size = size
         self.window = window
-        self.data_var = data_var
         self.flatten = flatten
-        self.data_dir = Path(config.CPC_DATADIR) / self.data_var
-        self.normalization_file = Path(config.CPC_DATADIR) / 'climatology' / f'climatology_{self.data_var}.zarr'
+        
+        self.data_path = data_path
+        self.data_var = data_var
+        self.data_dir = Path(self.data_path) / self.data_var
+        self.normalization_file = Path(self.data_path) / 'climatology' / f'climatology_{self.data_var}.zarr'
         
         # Check if years specified are within valid bounds
         self.years = years
@@ -173,36 +180,99 @@ class CPCDataset(Dataset):
 
 
 class MultimodalDataset(Dataset):
-    def __init__(self, dataset1, dataset2):
-        self.dataset1 = dataset1
-        self.dataset2 = dataset2
-        assert len(dataset1) == len(dataset2), 'Datasets should be of equal length'
-        assert dataset1.flatten == dataset2.flatten, 'Datasets configuration should be identical'
-        self.is_flatten = dataset1.flatten
+    def __init__(self, datasets):
+        self.datasets = datasets
+        self.is_flatten = datasets[0].flatten
 
     def __len__(self):
-        return len(self.dataset1)
+        return len(self.datasets[0])
 
     def __getitem__(self, idx):
-        data1 = self.dataset1[idx]
-        data2 = self.dataset2[idx]
-
-        x1, kwargs1 = data1
-        x2, kwargs2 = data2
+        all_x = list()
+        for dataset in self.datasets:
+            data = dataset[idx]
+            x, kwargs = data
+            all_x.append(x)
         
         dim = 0 if self.is_flatten else 1
-        x = torch.cat((x1, x2), dim=dim)
+        x = torch.cat(all_x, dim=dim).float()
 
-        return x, kwargs1
+        return x, kwargs
         
 
 def get_latent(latent, x):
     all_z = list()
     n_samples = x.shape[0]
     
-    for n in range(n_samples):
-        z = latent.encoder(x[n].to(device))
-        z = z.detach().cpu()
-        all_z.append(z)
+    with torch.no_grad():
+        for n in range(n_samples):
+            z = latent.encoder(x[n].to(device))
+            z = z.detach().cpu()
+            all_z.append(z)
         
     return torch.stack(all_z)
+
+def load_model_from_checkpoint(model_name, version_num):
+    log_dir = Path('logs') / model_name
+
+    # Retrieve hyperparameters
+    config_filepath = Path('lsda/configs') / f'{model_name}.yaml'
+    with open(config_filepath, 'r') as config_filepath:
+        hyperparams = yaml.load(config_filepath, Loader=yaml.FullLoader)
+
+    model_args = hyperparams['model_args']
+    data_args = hyperparams['data_args']
+
+    # Initialize model
+    baseline = model.LSDA(model_args=model_args, data_args=data_args).to(device)
+
+    # Load model from checkpoint
+    ckpt_filepath = log_dir / f'lightning_logs/version_{version_num}/checkpoints/'
+    ckpt_filepath = list(ckpt_filepath.glob('*.ckpt'))[0]
+    baseline = baseline.load_from_checkpoint(ckpt_filepath)
+    
+    return baseline
+
+def plot_assimilation_results(true, coarse, assimilated, param_idx):
+    """Helper function to plot assimilation results
+    """
+    # Plot true
+    f, ax = plt.subplots(1, len(true), figsize=(16,4))
+    for N in range(true.shape[0]):
+        ax[N].imshow(true[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
+        ax[N].axis('off')
+
+    # Plot coarsen
+    f, ax = plt.subplots(1, len(coarse), figsize=(16,4))
+    for N in range(coarse.shape[0]):
+        ax[N].imshow(coarse[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
+        ax[N].axis('off')
+
+    # Plot assimilation
+    for M in range(assimilated.shape[0]):
+        x_sample = assimilated[M]
+        x_sample = x_sample.detach().cpu()
+
+        f, ax = plt.subplots(1, x_sample.shape[0], figsize=(16,4))
+        for N in range(x_sample.shape[0]):
+            ax[N].imshow(x_sample[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
+            ax[N].axis('off')
+            
+            
+def plot_and_compute_distributions(true, assimilated, param_idx):
+    """Plot distributions and compute their distance
+    """
+    assimilated = assimilated.squeeze().detach().cpu()
+    
+    # Plot distributions
+    f, ax = plt.subplots()
+    sns.histplot(true[:,param_idx].flatten(), label='truth', stat='probability', ax=ax)
+    sns.histplot(assimilated[:,param_idx].flatten(), label='assimilated', stat='probability', ax=ax)
+    plt.legend();
+    
+    # Compute distance
+    wasserstein_d = wasserstein_distance(
+        true[:,param_idx].flatten(), 
+        assimilated[:,param_idx].flatten()
+    )
+    return wasserstein_d

@@ -1,0 +1,21 @@
+model_args:
+    model_name: 'lsda_1'
+    autoencoder_name: 'convae_1'
+    version_num: 0
+    all_input_size: 11
+    input_size: 10
+    window: 5
+    embedding: 64
+    hidden_channels: [32, 64, 128]
+    hidden_blocks: [3, 3, 3]
+    kernel_size: 3
+    epochs: 64
+    learning_rate: 0.0002
+    weight_decay: 0.001
+    
+data_args:
+    batch_size: 64
+    num_workers: 12
+    size: [120, 240]
+    train_years: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015]
+    val_years: [2016, 2017, 2018, 2019, 2020, 2021]
