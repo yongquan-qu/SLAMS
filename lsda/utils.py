@@ -233,33 +233,36 @@ def load_model_from_checkpoint(model_name, version_num):
     
     return baseline
 
-def plot_assimilation_results(true, coarse, assimilated, param_idx):
+def plot_assimilation_results(true, coarse, assimilated, param_idx, save_file=None):
     """Helper function to plot assimilation results
     """
     # Plot true
-    f, ax = plt.subplots(1, len(true), figsize=(16,4))
+    f, ax = plt.subplots(3, len(true), figsize=(16,4))
     for N in range(true.shape[0]):
-        ax[N].imshow(true[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
-        ax[N].axis('off')
+        ax[0,N].imshow(true[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
+        ax[0,N].axis('off')
 
     # Plot coarsen
-    f, ax = plt.subplots(1, len(coarse), figsize=(16,4))
     for N in range(coarse.shape[0]):
-        ax[N].imshow(coarse[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
-        ax[N].axis('off')
+        ax[1,N].imshow(coarse[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
+        ax[1,N].axis('off')
 
     # Plot assimilation
     for M in range(assimilated.shape[0]):
         x_sample = assimilated[M]
         x_sample = x_sample.detach().cpu()
 
-        f, ax = plt.subplots(1, x_sample.shape[0], figsize=(16,4))
         for N in range(x_sample.shape[0]):
-            ax[N].imshow(x_sample[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
-            ax[N].axis('off')
+            ax[2,N].imshow(x_sample[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
+            ax[2,N].axis('off')
+            
+    if save_file != None:
+        plt.savefig(save_file, dpi=200, bbox_inches='tight')
+        
+    plt.close()
             
             
-def plot_and_compute_distributions(true, assimilated, param_idx):
+def plot_and_compute_distributions(true, assimilated, param_idx, save_file=None):
     """Plot distributions and compute their distance
     """
     assimilated = assimilated.squeeze().detach().cpu()
@@ -269,6 +272,11 @@ def plot_and_compute_distributions(true, assimilated, param_idx):
     sns.histplot(true[:,param_idx].flatten(), label='truth', stat='probability', ax=ax)
     sns.histplot(assimilated[:,param_idx].flatten(), label='assimilated', stat='probability', ax=ax)
     plt.legend();
+    
+    if save_file != None:
+        plt.savefig(save_file, dpi=200, bbox_inches='tight')
+        
+    plt.close()
     
     # Compute distance
     wasserstein_d = wasserstein_distance(
