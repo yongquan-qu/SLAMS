@@ -238,6 +238,8 @@ def plot_assimilation_results(true, coarse, assimilated, param_idx, save_file=No
     """
     # Plot true
     f, ax = plt.subplots(3, len(true), figsize=(16,4))
+    plt.subplots_adjust(wspace=0.02, hspace=0.02)
+    
     for N in range(true.shape[0]):
         ax[0,N].imshow(true[N,param_idx], cmap=sns.cm.icefire, vmin=-2, vmax=2)
         ax[0,N].axis('off')
