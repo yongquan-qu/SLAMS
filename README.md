@@ -32,3 +32,4 @@ In order to reproduce the results in the paper, we have to acquire the necessary
     - `e`: Figures and tables generation
 
 
+__NOTE:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An exasmple, as defined in the paper, has been provided for your reference.
