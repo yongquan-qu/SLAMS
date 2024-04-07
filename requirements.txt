@@ -1,0 +1,15 @@
+jax==0.4.24
+jax_cfd==0.2.0
+lightning==2.0.9
+matplotlib==3.7.2
+numpy==1.25.2
+pandas==2.0.3
+PyYAML==6.0.1
+Requests==2.31.0
+scipy==1.13.0
+seaborn==0.13.2
+torch==2.0.1
+torch_harmonics==0.6.2
+tqdm==4.66.1
+xarray==2023.8.0
+zuko==1.1.0
