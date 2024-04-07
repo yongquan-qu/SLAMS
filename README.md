@@ -26,7 +26,7 @@ In order to reproduce the results in the paper, we have to acquire the necessary
 
 4. All evaluations are summarized in a series of `notebooks/` marked with `02_` prefix.
     - `a`: Pixel-based data assimilation
-    - `b`: Latent-based data assimilation
+    - `b`: Latent-based data assimilation NO observation (only background states)
     - `c`: Latent-based data assimilation with +1 observation (in-situ)
     - `d`: Latent-based data assimilation with +2 observation (in-situ + ex-situ)
     - `e`: Figures and tables generation
