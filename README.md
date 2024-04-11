@@ -1,10 +1,8 @@
 # SLAMS: Score-based Latent Assimilation in Multimodal Setting
 
-🎉🎉 __Accepted to CVPR2024 #EarthVision__ 🎉🎉
-
 We recast data assimilation in multimodal setting using deep generative framework. In particular, we implement __latent score-based diffusion model__ where we project the heterogeneous states and observations into a __unified latent space__ where the forward and reverse conditional diffusion processes take place. Through varying ablation study, given coarse, noisy, and sparse conditioning inputs, we find our method to be robust and physically consistent.
 
-📖: TBD
+Paper: https://arxiv.org/abs/2404.06665
 
 
 ## Quickstart
@@ -33,3 +31,15 @@ In order to reproduce the results in the paper, we have to acquire the necessary
 
 
 __NOTE:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An example, as defined in the paper, has been provided for your reference.
+
+## Citation
+```
+@misc{qu2024deep,
+      title={Deep Generative Data Assimilation in Multimodal Setting}, 
+      author={Yongquan Qu and Juan Nathaniel and Shuolin Li and Pierre Gentine},
+      year={2024},
+      eprint={2404.06665},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
