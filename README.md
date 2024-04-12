@@ -31,7 +31,7 @@ chmod +x process.sh
 
 4. Update `slams/config.py` field: `ERA_DATADIR = <YOUR_ERA5_DIR>`, for instance `<PROJECT_DIR>/SLAMS/data`
 
-__NOTE 1:__ All evaluations are summarized in a series of `notebooks/` marked with `02_` prefix.
+5. All evaluations are summarized in a series of `notebooks/` marked with `02_` prefix.
     - `a`: Pixel-based data assimilation
     - `b`: Latent-based data assimilation NO observation (only background states)
     - `c`: Latent-based data assimilation with +1 observation (in-situ)
@@ -39,7 +39,7 @@ __NOTE 1:__ All evaluations are summarized in a series of `notebooks/` marked wi
     - `e`: Figures and tables generation
 
 
-__NOTE 2:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An example, as defined in the paper, has been provided for your reference.
+__NOTE:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An example, as defined in the paper, has been provided for your reference.
 
 ## Citation
 ```
