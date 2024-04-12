@@ -19,10 +19,19 @@ pip install -r requirements.txt
 In order to reproduce the results in the paper, we have to acquire the necessary data:
 1. Process the in-situ data `python process_cpc.py`
 2. Process the ex-situ data `python process_noaa.py`
-3. Process the ERA5 data, follow quick instructions from https://leap-stc.github.io/ChaosBench/quickstart.html
-4. Update `slams/config.py` field: `ERA_DATADIR = <YOUR_ERA5_DIR>` as instructed by the previous step 
+3. Process the ERA5 data from https://leap-stc.github.io/ChaosBench/quickstart.html, particularly
+```
+cd data/
+wget https://huggingface.co/datasets/LEAP/ChaosBench/resolve/main/process.sh
+chmod +x process.sh
 
-4. All evaluations are summarized in a series of `notebooks/` marked with `02_` prefix.
+./process.sh era5
+./process.sh climatology
+```
+
+4. Update `slams/config.py` field: `ERA_DATADIR = <YOUR_ERA5_DIR>`, for instance `<PROJECT_DIR>/SLAMS/data`
+
+__NOTE 1:__ All evaluations are summarized in a series of `notebooks/` marked with `02_` prefix.
     - `a`: Pixel-based data assimilation
     - `b`: Latent-based data assimilation NO observation (only background states)
     - `c`: Latent-based data assimilation with +1 observation (in-situ)
@@ -30,7 +39,7 @@ In order to reproduce the results in the paper, we have to acquire the necessary
     - `e`: Figures and tables generation
 
 
-__NOTE:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An example, as defined in the paper, has been provided for your reference.
+__NOTE 2:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An example, as defined in the paper, has been provided for your reference.
 
 ## Citation
 ```
