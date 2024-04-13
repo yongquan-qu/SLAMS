@@ -1,6 +1,6 @@
 # SLAMS: Score-based Latent Assimilation in Multimodal Setting
 
-We recast data assimilation in multimodal setting using deep generative framework. In particular, we implement __latent score-based diffusion model__, extending previous work by Rozet, F., & Louppe, G. [[code](https://github.com/francois-rozet/sda), [paper](https://arxiv.org/abs/2306.10574)], where we further project the heterogeneous states and observations into a __unified latent space__ where the forward and reverse conditional diffusion processes take place. Through varying ablation study, given coarse, noisy, and sparse conditioning inputs, we find our method to be robust and physically consistent.
+We recast data assimilation in a multimodal setting using a deep generative framework. In particular, we implement a latent score-based diffusion model. We project heterogeneous states and observations into a unified latent space where the forward and reverse conditional diffusion processes take place. Through varying ablation studies, given coarse, noisy, and sparse conditioning inputs, we find our method to be robust and physically consistent. Part of this implementation builds upon components originally developed by Rozet, F., & Louppe, G. [[paper](https://arxiv.org/abs/2306.10574), [code](https://github.com/francois-rozet/sda)] under the MIT License, which we have adapted and extended to fit our research framework.
 
 Paper: https://arxiv.org/abs/2404.06665
 
