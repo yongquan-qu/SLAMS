@@ -1,4 +1,4 @@
-r"""Score modules"""
+r"""We adapt score module codes from Score-based Data Assimilation (https://arxiv.org/abs/2306.10574)"""
 
 import math
 from zuko.utils import broadcast
