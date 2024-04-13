@@ -1,6 +1,6 @@
 # SLAMS: Score-based Latent Assimilation in Multimodal Setting
 
-We recast data assimilation in multimodal setting using deep generative framework. In particular, we implement __latent score-based diffusion model__ where we project the heterogeneous states and observations into a __unified latent space__ where the forward and reverse conditional diffusion processes take place. Through varying ablation study, given coarse, noisy, and sparse conditioning inputs, we find our method to be robust and physically consistent.
+We recast data assimilation in multimodal setting using deep generative framework. In particular, we implement __latent score-based diffusion model__, extending previous work by Rozet, F., & Louppe, G. [[code](https://github.com/francois-rozet/sda), [paper](https://arxiv.org/abs/2306.10574)], where we further project the heterogeneous states and observations into a __unified latent space__ where the forward and reverse conditional diffusion processes take place. Through varying ablation study, given coarse, noisy, and sparse conditioning inputs, we find our method to be robust and physically consistent.
 
 Paper: https://arxiv.org/abs/2404.06665
 
@@ -11,7 +11,7 @@ Paper: https://arxiv.org/abs/2404.06665
 pip install -r requirements.txt
 ```
 
-2. Run sample notebooks under `notebooks/` marked with `01_` prefix.
+2. Run sample notebooks under `notebooks/` marked with `01_` prefix. These examples are extended from [1] to benchmark against our latent approach.
 - `a`: Lorenz'63 system
 - `b`: Kolmogorov fluid
 
@@ -42,7 +42,16 @@ chmod +x process.sh
 __NOTE:__ Training your own model is simple and is defined in `train_da.py`. First, define your latent model in `slams/nn.py` or score network in `slams/score.py`. Afterwards, unify both under `slams/model_da.py`. An example, as defined in the paper, has been provided for your reference.
 
 ## Citation
+If you find any of the code useful, feel free to cite these works.
 ```
+@article{rozet2024score,
+  title={Score-based data assimilation},
+  author={Rozet, Fran{\c{c}}ois and Louppe, Gilles},
+  journal={Advances in Neural Information Processing Systems},
+  volume={36},
+  year={2024}
+}
+
 @misc{qu2024deep,
       title={Deep Generative Data Assimilation in Multimodal Setting}, 
       author={Yongquan Qu and Juan Nathaniel and Shuolin Li and Pierre Gentine},
