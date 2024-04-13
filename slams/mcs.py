@@ -1,4 +1,4 @@
-r"""Markov chains"""
+r"""We adapt codes from Score-based Data Assimilation (https://arxiv.org/abs/2306.10574)"""
 
 import abc
 import numpy as np
