@@ -11,7 +11,7 @@ Paper: https://arxiv.org/abs/2404.06665
 pip install -r requirements.txt
 ```
 
-2. Run sample notebooks under `notebooks/` marked with `01_` prefix. These examples are extended from [1] to benchmark against our latent approach.
+2. Run sample notebooks under `notebooks/` marked with `01_` prefix. These examples are extended from [[1](https://github.com/francois-rozet/sda)] to benchmark against our latent approach.
 - `a`: Lorenz'63 system
 - `b`: Kolmogorov fluid
 
@@ -44,14 +44,6 @@ __NOTE:__ Training your own model is simple and is defined in `train_da.py`. Fir
 ## Citation
 If you find any of the code useful, feel free to cite these works.
 ```
-@article{rozet2024score,
-  title={Score-based data assimilation},
-  author={Rozet, Fran{\c{c}}ois and Louppe, Gilles},
-  journal={Advances in Neural Information Processing Systems},
-  volume={36},
-  year={2024}
-}
-
 @misc{qu2024deep,
       title={Deep Generative Data Assimilation in Multimodal Setting}, 
       author={Yongquan Qu and Juan Nathaniel and Shuolin Li and Pierre Gentine},
@@ -59,5 +51,13 @@ If you find any of the code useful, feel free to cite these works.
       eprint={2404.06665},
       archivePrefix={arXiv},
       primaryClass={cs.CV}
+}
+
+@article{rozet2024score,
+  title={Score-based data assimilation},
+  author={Rozet, Fran{\c{c}}ois and Louppe, Gilles},
+  journal={Advances in Neural Information Processing Systems},
+  volume={36},
+  year={2024}
 }
 ```
